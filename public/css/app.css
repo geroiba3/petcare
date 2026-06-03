@@ -1,0 +1,68 @@
+/* Colores principales */
+:root {
+    --color-primary: #F97316;
+    --color-primary-dark: #EA580C;
+    --color-bg: #F9FAFB;
+}
+
+/* General */
+body {
+    background-color: var(--color-bg);
+    font-family: 'Segoe UI', sans-serif;
+}
+
+/* Navbar */
+.navbar-brand {
+    font-size: 1.5rem;
+    color: var(--color-primary) !important;
+}
+
+/* Botón principal */
+.btn-petcare {
+    background-color: var(--color-primary);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    padding: 10px 28px;
+    font-weight: 600;
+    transition: background 0.2s;
+}
+
+.btn-petcare:hover {
+    background-color: var(--color-primary-dark);
+    color: white;
+}
+
+/* Cards */
+.card-petcare {
+    border: none;
+    border-radius: 16px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+    transition: box-shadow 0.2s;
+}
+
+.card-petcare:hover {
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+}
+
+/* Títulos */
+.title-main {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: #1F2937;
+}
+
+.text-petcare {
+    color: var(--color-primary);
+}
+/* Botón Bootstrap override */
+.btn-warning {
+    background-color: var(--color-primary) !important;
+    border-color: var(--color-primary) !important;
+    color: white !important;
+}
+
+.btn-warning:hover {
+    background-color: var(--color-primary-dark) !important;
+    border-color: var(--color-primary-dark) !important;
+}

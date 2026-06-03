@@ -10,7 +10,7 @@ Route::get('/login', function () {
     return view('auth.login');
 });
 Route::post('/logout', function () {
-    auth()->logout();
+    Auth()->logout();
     return redirect('/');
 });
 Route::get('/register', function () {
@@ -20,4 +20,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', function () {
         return view('dashboard');
     });
+});
+Route::get('/mascotas', function () {
+    return view('mascotas.index');
 });

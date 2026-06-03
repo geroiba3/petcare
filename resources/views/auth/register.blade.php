@@ -1,63 +1,39 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PetCare - Registrarse</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-</head>
-<body class="bg-gray-50 flex items-center justify-center min-h-screen">
+@extends('layouts.app')
 
-    <div class="bg-white rounded-2xl shadow-lg p-10 w-full max-w-md">
-        
-        <div class="text-center mb-8">
-            <h1 class="text-3xl font-bold text-orange-500">🐾 PetCare</h1>
-            <p class="text-gray-500 mt-2">Creá tu cuenta gratis</p>
+@section('content')
+<div class="row justify-content-center">
+    <div class="col-md-5">
+        <div class="card card-petcare p-4">
+            <div class="text-center mb-4">
+                <h2 class="fw-bold text-petcare">🐾 PetCare</h2>
+                <p class="text-muted">Creá tu cuenta gratis</p>
+            </div>
+
+            <form method="POST" action="/register">
+                @csrf
+                <div class="mb-3">
+                    <label class="form-label fw-medium">Nombre</label>
+                    <input type="text" name="name" class="form-control" placeholder="Tu nombre" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-medium">Email</label>
+                    <input type="email" name="email" class="form-control" placeholder="tu@email.com" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-medium">Contraseña</label>
+                    <input type="password" name="password" class="form-control" placeholder="••••••••" required>
+                </div>
+                <div class="mb-4">
+                    <label class="form-label fw-medium">Confirmar contraseña</label>
+                    <input type="password" name="password_confirmation" class="form-control" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="btn btn-petcare w-100">Crear cuenta</button>
+            </form>
+
+            <p class="text-center text-muted mt-4">
+                ¿Ya tenés cuenta? <a href="/login" class="text-petcare fw-medium">Iniciá sesión</a>
+            </p>
         </div>
-
-        <form method="POST" action="/register">
-            @csrf
-
-            <div class="mb-4">
-                <label class="block text-gray-700 font-medium mb-2">Nombre</label>
-                <input type="text" name="name" required
-                    class="w-full border rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-orange-400"
-                    placeholder="Tu nombre">
-            </div>
-
-            <div class="mb-4">
-                <label class="block text-gray-700 font-medium mb-2">Email</label>
-                <input type="email" name="email" required
-                    class="w-full border rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-orange-400"
-                    placeholder="tu@email.com">
-            </div>
-
-            <div class="mb-4">
-                <label class="block text-gray-700 font-medium mb-2">Contraseña</label>
-                <input type="password" name="password" required
-                    class="w-full border rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-orange-400"
-                    placeholder="••••••••">
-            </div>
-
-            <div class="mb-6">
-                <label class="block text-gray-700 font-medium mb-2">Confirmar contraseña</label>
-                <input type="password" name="password_confirmation" required
-                    class="w-full border rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-orange-400"
-                    placeholder="••••••••">
-            </div>
-
-            <button type="submit"
-                class="w-full bg-orange-500 text-white py-3 rounded-lg font-bold hover:bg-orange-600 transition">
-                Crear cuenta
-            </button>
-        </form>
-
-        <p class="text-center text-gray-500 mt-6">
-            ¿Ya tenés cuenta? 
-            <a href="/login" class="text-orange-500 font-medium hover:underline">Iniciá sesión</a>
-        </p>
-
     </div>
-
-</body>
-</html>
+</div>
+@endsection
