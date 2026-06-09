@@ -7,19 +7,13 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
+use Kreait\Laravel\Firebase\Facades\Firebase;
 use Laravel\Fortify\Contracts\CreatesNewUsers;
 
 class CreateNewUser implements CreatesNewUsers
 {
     use PasswordValidationRules;
 
-    /**
-     * Validate and create a newly registered user.
-     *
-     * @param  array<string, string>  $input
-     *
-     * @throws ValidationException
-     */
     public function create(array $input): User
     {
         Validator::make($input, [
@@ -34,10 +28,24 @@ class CreateNewUser implements CreatesNewUsers
             'password' => $this->passwordRules(),
         ])->validate();
 
-        return User::create([
+        // Crear usuario en SQLite
+        $user = User::create([
             'name' => $input['name'],
             'email' => $input['email'],
             'password' => Hash::make($input['password']),
+            'role' => 'user',
         ]);
+
+        // Guardar en Firebase Realtime Database
+        $db = Firebase::database();
+        $db->getReference('usuarios/' . $user->id)->set([
+            'id' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
+            'role' => 'user',
+            'created_at' => now()->toDateTimeString(),
+        ]);
+
+        return $user;
     }
 }
