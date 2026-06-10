@@ -12,12 +12,12 @@
            <form method="POST" action="{{ route('login') }}">
                 @csrf
                 @if ($errors->any())
-    <div class="alert alert-danger mb-3">
-        @foreach ($errors->all() as $error)
+            <div class="alert alert-danger mb-3">
+                @foreach ($errors->all() as $error)
             <p class="mb-0">{{ $error }}</p>
-        @endforeach
-    </div>
-@endif
+            @endforeach
+            </div>
+            @endif
                 <div class="mb-3">
                     <label class="form-label fw-medium">Email</label>
                     <input type="email" name="email" class="form-control" placeholder="tu@email.com" required>

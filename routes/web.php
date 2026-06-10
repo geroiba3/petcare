@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\MascotaController;
 
 Route::get('/', function () {
     return view('index');
@@ -22,7 +23,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', function () {
         return view('dashboard');
     })->name('dashboard');
+
+Route::get('/mascotas', [MascotaController::class, 'index'])->name('mascotas');
+Route::get('/mascotas/crear', [MascotaController::class, 'create'])->name('mascotas.crear');
+Route::post('/mascotas', [MascotaController::class, 'store'])->name('mascotas.store');
 });
-Route::get('/mascotas', function () {
-    return view('mascotas.index');
-})->name('mascotas');
