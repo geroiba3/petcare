@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\MascotaController;
 use App\Http\Controllers\TurnoController;
+use App\Http\Controllers\HistorialController;
 
 Route::get('/', function () {
     return view('index');
@@ -28,10 +29,15 @@ Route::middleware(['auth'])->group(function () {
 Route::get('/mascotas', [MascotaController::class, 'index'])->name('mascotas');
 Route::get('/mascotas/crear', [MascotaController::class, 'create'])->name('mascotas.crear');
 Route::post('/mascotas', [MascotaController::class, 'store'])->name('mascotas.store');
+Route::get('/mascotas/{id}/editar', [MascotaController::class, 'edit'])->name('mascotas.editar');
+Route::put('/mascotas/{id}', [MascotaController::class, 'update'])->name('mascotas.update');
+Route::delete('/mascotas/{id}', [MascotaController::class, 'destroy'])->name('mascotas.destroy');
+
 
 Route::get('/turnos', [TurnoController::class, 'index'])->name('turnos');
 Route::get('/turnos/crear', [TurnoController::class, 'create'])->name('turnos.crear');
 Route::post('/turnos', [TurnoController::class, 'store'])->name('turnos.store');
 Route::delete('/turnos/{id}', [TurnoController::class, 'destroy'])->name('turnos.destroy');
 
+Route::get('/mascotas/{mascotaId}/historial', [HistorialController::class, 'index'])->name('historial.index');
 });

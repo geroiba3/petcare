@@ -11,7 +11,7 @@
             </div>
 
             <div class="card card-petcare p-4">
-                <form method="POST" action="/mascotas">
+                <form method="POST" action="/mascotas" enctype="multipart/form-data">
                     @csrf
 
                     @if ($errors->any())
@@ -21,6 +21,12 @@
                             @endforeach
                         </div>
                     @endif
+
+                    <div class="mb-3 text-center">
+                        <label class="form-label fw-medium d-block">Foto de perfil</label>
+                        <img id="preview" src="https://via.placeholder.com/120x120?text=🐾" class="rounded-circle mb-2" width="120" height="120" style="object-fit: cover;">
+                        <input type="file" name="foto" accept="image/*" class="form-control" onchange="previsualizar(this)">
+                    </div>
 
                     <div class="mb-3">
                         <label class="form-label fw-medium">Nombre</label>
@@ -54,5 +60,15 @@
 
         </div>
     </div>
+
+    <script>
+        function previsualizar(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = e => document.getElementById('preview').src = e.target.result;
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+    </script>
 
 @endsection

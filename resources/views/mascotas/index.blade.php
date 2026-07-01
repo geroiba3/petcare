@@ -26,22 +26,37 @@
         <div class="row g-4">
             @foreach($mascotas as $id => $mascota)
                 <div class="col-md-4">
-                    <div class="card card-petcare p-4">
-                        <div class="fs-1 mb-2">
-                            @if($mascota['especie'] === 'perro') 🐶
-                            @elseif($mascota['especie'] === 'gato') 🐱
-                            @elseif($mascota['especie'] === 'ave') 🐦
-                            @else 🐾
-                            @endif
-                        </div>
-                        <h5 class="fw-bold">{{ $mascota['nombre'] }}</h5>
+                    <div class="card card-petcare p-4 text-center">
+
+                        @if(!empty($mascota['foto']))
+                            <img src="{{ $mascota['foto'] }}" class="rounded-circle mx-auto mb-3" width="100" height="100" style="object-fit: cover;">
+                        @else
+                            <div class="fs-1 mb-2">
+                                @if($mascota['especie'] === 'perro') 
+                                @elseif($mascota['especie'] === 'gato') 
+                                @elseif($mascota['especie'] === 'ave') 
+                                @else 🐾
+                                @endif
+                            </div>
+                        @endif
+
+                        <h5 class="fw-bold mb-1">{{ $mascota['nombre'] }}</h5>
                         <p class="text-muted mb-1">{{ ucfirst($mascota['especie']) }}</p>
                         @if($mascota['raza'])
                             <p class="text-muted mb-1">{{ $mascota['raza'] }}</p>
                         @endif
-                        @if($mascota['fecha_nacimiento'])
-                            <p class="text-muted small">Nacimiento: {{ $mascota['fecha_nacimiento'] }}</p>
+                        @if(!empty($mascota['edad']))
+                            <p class="text-muted small mb-0">{{ $mascota['edad'] }}</p>
                         @endif
+                    </div>
+                <div class="d-flex gap-2 justify-content-center mt-2 flex-wrap">
+                        <a href="/mascotas/{{ $id }}/historial" class="btn btn-outline-primary btn-sm">📋 Historial</a>
+                        <a href="/mascotas/{{ $id }}/editar" class="btn btn-outline-secondary btn-sm">Editar</a>
+                    <form method="POST" action="/mascotas/{{ $id }}" onsubmit="return confirm('¿Seguro que querés eliminar a {{ $mascota['nombre'] }}?')">
+                        @csrf
+                        @method('DELETE')
+                    <button type="submit" class="btn btn-outline-danger btn-sm">Eliminar</button>
+                    </form>
                     </div>
                 </div>
             @endforeach
