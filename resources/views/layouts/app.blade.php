@@ -14,7 +14,7 @@
         <a class="navbar-brand fw-bold text-warning" href="/">🐾 PetCare</a>
         <div class="ms-auto d-flex align-items-center gap-3">
             @auth
-                <span class="text-muted">Hola, {{ auth()->user()->name }}</span>
+             <a href="/perfil" class="text-muted text-decoration-none">Hola, {{ auth()->user()->name }}</a>
                 <form method="POST" action="/logout">
                     @csrf
                     <button type="submit" class="btn btn-warning text-white">Cerrar sesión</button>

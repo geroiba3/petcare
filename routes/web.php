@@ -4,6 +4,10 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\MascotaController;
 use App\Http\Controllers\TurnoController;
 use App\Http\Controllers\HistorialController;
+use App\Http\Controllers\VeterinarioController;
+use App\Http\Controllers\UsuarioController;
+
+
 
 Route::get('/', function () {
     return view('index');
@@ -26,6 +30,12 @@ Route::middleware(['auth'])->group(function () {
         return view('dashboard');
     })->name('dashboard');
 
+Route::get('/perfil', [UsuarioController::class, 'index'])->name('perfil');
+Route::get('/perfil/editar', [UsuarioController::class, 'edit'])->name('perfil.edit');
+Route::put('/perfil', [UsuarioController::class, 'update'])->name('perfil.update');
+Route::post('/perfil/password', [UsuarioController::class, 'cambiarPassword'])->name('perfil.password');
+
+
 Route::get('/mascotas', [MascotaController::class, 'index'])->name('mascotas');
 Route::get('/mascotas/crear', [MascotaController::class, 'create'])->name('mascotas.crear');
 Route::post('/mascotas', [MascotaController::class, 'store'])->name('mascotas.store');
@@ -40,4 +50,8 @@ Route::post('/turnos', [TurnoController::class, 'store'])->name('turnos.store');
 Route::delete('/turnos/{id}', [TurnoController::class, 'destroy'])->name('turnos.destroy');
 
 Route::get('/mascotas/{mascotaId}/historial', [HistorialController::class, 'index'])->name('historial.index');
+
+Route::get('/veterinario', [VeterinarioController::class, 'index'])->name('veterinario.index');
+Route::get('/veterinario/turnos/{turnoId}/completar', [VeterinarioController::class, 'completar'])->name('veterinario.completar');
+Route::post('/veterinario/turnos/{turnoId}/completar', [VeterinarioController::class, 'guardarConsulta'])->name('veterinario.guardar');
 });
