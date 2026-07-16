@@ -6,7 +6,7 @@ use App\Http\Controllers\TurnoController;
 use App\Http\Controllers\HistorialController;
 use App\Http\Controllers\VeterinarioController;
 use App\Http\Controllers\UsuarioController;
-
+use App\Http\Controllers\GoogleController;
 
 
 Route::get('/', function () {
@@ -54,4 +54,8 @@ Route::get('/mascotas/{mascotaId}/historial', [HistorialController::class, 'inde
 Route::get('/veterinario', [VeterinarioController::class, 'index'])->name('veterinario.index');
 Route::get('/veterinario/turnos/{turnoId}/completar', [VeterinarioController::class, 'completar'])->name('veterinario.completar');
 Route::post('/veterinario/turnos/{turnoId}/completar', [VeterinarioController::class, 'guardarConsulta'])->name('veterinario.guardar');
+
 });
+
+Route::get('/auth/google', [GoogleController::class, 'redirect'])->name('google.redirect');
+Route::get('/auth/google/callback', [GoogleController::class, 'callback'])->name('google.callback');

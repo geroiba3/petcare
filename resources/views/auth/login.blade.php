@@ -30,6 +30,14 @@
             </form>
 
             <p class="text-center text-muted mt-4">
+                <div class="text-center my-3">
+    <span class="text-muted">— o —</span>
+</div>
+
+<a href="/auth/google" class="btn btn-outline-dark w-100 d-flex align-items-center justify-content-center gap-2">
+    <img src="https://www.google.com/favicon.ico" width="18" height="18">
+    Continuar con Google
+</a>
                 ¿No tenés cuenta? <a href="/register" class="text-petcare fw-medium">Registrate</a>
             </p>
         </div>

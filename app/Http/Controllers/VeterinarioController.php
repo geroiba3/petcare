@@ -8,25 +8,29 @@ use Kreait\Laravel\Firebase\Facades\Firebase;
 class VeterinarioController extends Controller
 {
     public function index()
-{
-    return "Panel veterinario funcionando";
-}
-   /* public function index()
     {
-        $db = Firebase::database();
-        $turnos = $db->getReference('turnos_pendientes')->getValue() ?? [];
+       // Solo veterinarios pueden acceder
+    if (!auth()->user()->isVet()) {
+        return redirect('/dashboard')->with('error', 'No tenés permisos para acceder a esta sección.');
+    }
 
-        // Filtrar solo los pendientes
-        $turnos = array_filter($turnos, fn($t) => ($t['estado'] ?? '') === 'pendiente');
+    $db = Firebase::database();
+    $turnos = $db->getReference('turnos_pendientes')->getValue() ?? [];
 
-        // Ordenar por fecha
-        uasort($turnos, fn($a, $b) => strcmp($a['fecha'], $b['fecha']));
+    // Filtrar solo los pendientes
+    $turnos = array_filter($turnos, fn($t) => ($t['estado'] ?? '') === 'pendiente');
 
-        return view('veterinario.index', ['turnos' => $turnos]);
-    }*/
+    // Ordenar por fecha
+    uasort($turnos, fn($a, $b) => strcmp($a['fecha'], $b['fecha']));
+
+    return view('veterinario.index', ['turnos' => $turnos]);
+    }
 
     public function completar($turnoId)
     {
+        if (!auth()->user()->isVet()) {
+        return redirect('/dashboard')->with('error', 'No tenés permisos para acceder a esta sección.');
+}
         $db = Firebase::database();
         $turno = $db->getReference('turnos_pendientes/' . $turnoId)->getValue();
 
@@ -42,6 +46,9 @@ class VeterinarioController extends Controller
 
     public function guardarConsulta(Request $request, $turnoId)
     {
+        if (!auth()->user()->isVet()) {
+        return redirect('/dashboard')->with('error', 'No tenés permisos para acceder a esta sección.');
+}
         $data = $request->validate([
             'tipo' => 'required|string',
             'diagnostico' => 'required|string|max:500',
