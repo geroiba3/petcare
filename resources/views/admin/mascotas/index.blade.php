@@ -65,6 +65,8 @@
                             @endif
                         </td>
                         <td class="text-end">
+                            <a href="{{ route('admin.mascotas.edit', [$mascota['user_id'], $mascota['id']]) }}"
+                               class="btn btn-sm btn-outline-secondary">Editar</a>
                             <form action="{{ route('admin.mascotas.activo', [$mascota['user_id'], $mascota['id']]) }}"
                                   method="POST" class="d-inline">
                                 @csrf

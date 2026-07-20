@@ -67,10 +67,14 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
     Route::resource('veterinarias', VeterinariaController::class)->except(['show']);
     Route::get('usuarios', [UsuarioAdminController::class, 'index'])->name('usuarios.index');
+    Route::get('usuarios/{id}/editar', [UsuarioAdminController::class, 'edit'])->name('usuarios.edit');
+    Route::put('usuarios/{id}', [UsuarioAdminController::class, 'update'])->name('usuarios.update');
     Route::put('usuarios/{id}/rol', [UsuarioAdminController::class, 'cambiarRol'])->name('usuarios.rol');
     Route::put('usuarios/{id}/activo', [UsuarioAdminController::class, 'toggleActivo'])->name('usuarios.activo');
     Route::get('veterinarios', [UsuarioAdminController::class, 'veterinarios'])->name('veterinarios.index');
     Route::get('mascotas', [MascotaAdminController::class, 'index'])->name('mascotas.index');
+    Route::get('mascotas/{userId}/{mascotaId}/editar', [MascotaAdminController::class, 'edit'])->name('mascotas.edit');
+    Route::put('mascotas/{userId}/{mascotaId}', [MascotaAdminController::class, 'update'])->name('mascotas.update');
     Route::put('mascotas/{userId}/{mascotaId}/activo', [MascotaAdminController::class, 'toggleActivo'])->name('mascotas.activo');
 });
 });

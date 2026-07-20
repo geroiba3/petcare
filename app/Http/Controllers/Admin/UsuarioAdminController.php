@@ -50,12 +50,35 @@ class UsuarioAdminController extends Controller
         //
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
+      public function edit(string $id)
     {
-        //
+        $usuario = User::findOrFail($id);
+
+        return view('admin.usuarios.edit', ['usuario' => $usuario]);
+    }
+
+    public function update(Request $request, string $id)
+    {
+        $usuario = User::findOrFail($id);
+
+        $data = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255|unique:users,email,' . $usuario->id,
+        ]);
+
+        $usuario->name = $data['name'];
+        $usuario->email = $data['email'];
+        $usuario->save();
+
+        // Sincronizar con Firebase
+        $db = Firebase::database();
+        $db->getReference('usuarios/' . $usuario->id)->update([
+            'name' => $usuario->name,
+            'email' => $usuario->email,
+        ]);
+
+        return redirect()->route('admin.usuarios.index')
+            ->with('success', 'Usuario "' . $usuario->name . '" actualizado.');
     }
    
      public function cambiarRol(Request $request, $id)
@@ -84,13 +107,6 @@ class UsuarioAdminController extends Controller
             ->with('success', 'Rol de ' . $usuario->name . ' actualizado a "' . $data['role'] . '".');
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
 
     /**
      * Remove the specified resource from storage.

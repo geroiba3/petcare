@@ -10,7 +10,7 @@ class MascotaController extends Controller
     public function index()
 {
     $db = Firebase::database();
-    $userId = auth()->user()->id;
+    $userId = auth()->id();
     $mascotas = $db->getReference('mascotas/' . $userId)->getValue() ?? [];
 
     foreach ($mascotas as $id => &$mascota) {
@@ -68,7 +68,7 @@ class MascotaController extends Controller
         }
 
         $db = Firebase::database();
-        $userId = auth()->id();
+        $userId = auth()->user()->id;
 
         $db->getReference('mascotas/' . $userId)->push([
             'nombre' => $data['nombre'],

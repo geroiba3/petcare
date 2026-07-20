@@ -57,6 +57,8 @@
                         @endif
                     </td>
                     <td class="text-end">
+                        <a href="{{ route('admin.usuarios.edit', $usuario->id) }}"
+                               class="btn btn-sm btn-outline-secondary">Editar</a>
                         @if ($usuario->id !== auth()->id())
                             <form action="{{ route('admin.usuarios.activo', $usuario->id) }}" method="POST" class="d-inline">
                                 @csrf
