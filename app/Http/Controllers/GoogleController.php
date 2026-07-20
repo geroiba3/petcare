@@ -43,8 +43,12 @@ class GoogleController extends Controller
                 'role' => 'user',
                 'created_at' => now()->toDateTimeString(),
             ]);
+            
         }
-
+            if (!$user->activo) {
+            return redirect('/login')->with('error', 'Tu cuenta está desactivada. Contactá al administrador.');
+            }
+  
         Auth::login($user);
 
         return redirect('/dashboard');

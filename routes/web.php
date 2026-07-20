@@ -1,13 +1,17 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\MascotaController;
 use App\Http\Controllers\TurnoController;
 use App\Http\Controllers\HistorialController;
 use App\Http\Controllers\VeterinarioController;
 use App\Http\Controllers\UsuarioController;
 use App\Http\Controllers\GoogleController;
-
+use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\VeterinariaController;
+use App\Http\Controllers\Admin\UsuarioAdminController;
+use App\Http\Controllers\Admin\MascotaAdminController;
 
 Route::get('/', function () {
     return view('index');
@@ -22,7 +26,7 @@ Route::get('/register', function () {
 })->name('register');
 
 Route::post('/logout', function () {
-    Auth()->logout();
+    Auth::logout();
     return redirect('/');
 })->name('logout');
 Route::middleware(['auth'])->group(function () {
@@ -55,6 +59,20 @@ Route::get('/veterinario', [VeterinarioController::class, 'index'])->name('veter
 Route::get('/veterinario/turnos/{turnoId}/completar', [VeterinarioController::class, 'completar'])->name('veterinario.completar');
 Route::post('/veterinario/turnos/{turnoId}/completar', [VeterinarioController::class, 'guardarConsulta'])->name('veterinario.guardar');
 
+Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+Route::resource('veterinarias', VeterinariaController::class)->except(['show']);
+});
+Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+    Route::resource('veterinarias', VeterinariaController::class)->except(['show']);
+    Route::get('usuarios', [UsuarioAdminController::class, 'index'])->name('usuarios.index');
+    Route::put('usuarios/{id}/rol', [UsuarioAdminController::class, 'cambiarRol'])->name('usuarios.rol');
+    Route::put('usuarios/{id}/activo', [UsuarioAdminController::class, 'toggleActivo'])->name('usuarios.activo');
+    Route::get('veterinarios', [UsuarioAdminController::class, 'veterinarios'])->name('veterinarios.index');
+    Route::get('mascotas', [MascotaAdminController::class, 'index'])->name('mascotas.index');
+    Route::put('mascotas/{userId}/{mascotaId}/activo', [MascotaAdminController::class, 'toggleActivo'])->name('mascotas.activo');
+});
 });
 
 Route::get('/auth/google', [GoogleController::class, 'redirect'])->name('google.redirect');

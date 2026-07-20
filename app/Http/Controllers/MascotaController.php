@@ -10,7 +10,7 @@ class MascotaController extends Controller
     public function index()
 {
     $db = Firebase::database();
-    $userId = auth()->id();
+    $userId = auth()->user()->id;
     $mascotas = $db->getReference('mascotas/' . $userId)->getValue() ?? [];
 
     foreach ($mascotas as $id => &$mascota) {
@@ -36,8 +36,13 @@ class MascotaController extends Controller
         } else {
             $mascota['edad'] = null;
         }
-    }
 
+        // Filtrar mascotas inactivas
+        if (!($mascota['activo'] ?? true)) {
+            unset($mascotas[$id]);
+            continue;
+        }
+    }
     return view('mascotas.index', ['mascotas' => $mascotas]);
 }
 
