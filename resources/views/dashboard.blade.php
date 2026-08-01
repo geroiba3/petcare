@@ -14,7 +14,7 @@
             </a>
         </div>
         <div class="col-md-4">
-            <a href="/agenda" class="text-decoration-none">
+            <a href="/turnos" class="text-decoration-none">
                 <div class="card card-petcare p-4 text-center">
                     <div class="fs-1 mb-3">📅</div>
                     <h5 class="fw-bold text-dark">Agenda</h5>

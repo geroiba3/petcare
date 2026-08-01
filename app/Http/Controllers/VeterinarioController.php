@@ -14,11 +14,14 @@ class VeterinarioController extends Controller
         return redirect('/dashboard')->with('error', 'No tenés permisos para acceder a esta sección.');
     }
 
-    $db = Firebase::database();
+     $db = Firebase::database();
+    $vetId = auth()->id();
     $turnos = $db->getReference('turnos_pendientes')->getValue() ?? [];
 
-    // Filtrar solo los pendientes
-    $turnos = array_filter($turnos, fn($t) => ($t['estado'] ?? '') === 'pendiente');
+    // Filtrar solo los pendientes y del vet logueado
+    $turnos = array_filter($turnos, fn($t) =>
+        ($t['estado'] ?? '') === 'pendiente' && ($t['vet_id'] ?? null) == $vetId
+    );
 
     // Ordenar por fecha
     uasort($turnos, fn($a, $b) => strcmp($a['fecha'], $b['fecha']));

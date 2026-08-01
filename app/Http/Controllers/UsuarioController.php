@@ -3,18 +3,30 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Kreait\Laravel\Firebase\Facades\Firebase;
 
 class UsuarioController extends Controller
 {
+    private function authenticatedUser(): \Illuminate\Foundation\Auth\User
+    {
+        $user = Auth::user();
+
+        if (!$user instanceof \Illuminate\Foundation\Auth\User) {
+            abort(401);
+        }
+
+        return $user;
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-    $user = auth()->user();
-    return view('usuario.index', ['user' => $user]);
+        $user = $this->authenticatedUser();
+        return view('usuario.index', ['user' => $user]);
     }
 
     /**
@@ -46,13 +58,19 @@ class UsuarioController extends Controller
      */
      public function edit()
     {
-        $user = auth()->user();
-        return view('usuario.edit', ['user' => $user]);
+        $user = $this->authenticatedUser();
+        $horario = null;
+        if ($user->role === 'vet') {
+            $db = Firebase::database();
+            $horario =  $db->getReference('usuarios/' . $user->id . '/horario')->getValue();
+        }
+
+        return view('usuario.edit', ['user' => $user, 'horario' => $horario]);
     }
 
     public function update(Request $request)
     {
-        $user = auth()->user();
+        $user = $this->authenticatedUser();
 
         $data = $request->validate([
             'name' => 'required|string|max:255',
@@ -90,7 +108,7 @@ class UsuarioController extends Controller
             'password' => 'required|string|min:8|confirmed',
         ]);
 
-        $user = auth()->user();
+        $user = $this->authenticatedUser();
 
         if (!Hash::check($request->password_actual, $user->password)) {
             return back()->withErrors(['password_actual' => 'La contraseña actual no es correcta.']);
@@ -102,6 +120,34 @@ class UsuarioController extends Controller
         return redirect('/perfil')->with('success', '¡Contraseña actualizada!');
     }
 
+    public function guardarHorario(Request $request)
+    {
+        $user = $this->authenticatedUser();
+
+        if (!$user->isVet()) {
+            abort(403);
+        }
+
+        $data = $request->validate([
+            'dias' => 'required|array|min:1',
+            'dias.*' => 'in:lunes,martes,miercoles,jueves,viernes,sabado,domingo',
+            'hora_inicio' => 'required',
+            'hora_fin' => 'required|after:hora_inicio',
+            'duracion_min' => 'required|integer|in:15,20,30,45,60',
+        ]);
+
+        $horario = [
+            'dias' => $data['dias'],
+            'hora_inicio' => $data['hora_inicio'],
+            'hora_fin' => $data['hora_fin'],
+            'duracion_min' => $data['duracion_min'],
+        ];
+
+        $db = Firebase::database();
+        $db->getReference('usuarios/' . $user->id . '/horario')->set($horario);
+
+        return redirect('/perfil/editar')->with('success', '¡Horario actualizado!');
+    }
     /**
      * Remove the specified resource from storage.
      */

@@ -23,8 +23,11 @@ class UsuarioAdminController extends Controller
      public function veterinarios()
     {
         $usuarios = User::where('role', 'vet')->orderBy('created_at', 'desc')->get();
+        $db = Firebase::database();
+        $veterinarias = $db->getReference('veterinarias')->getValue() ?? []; 
 
-        return view('admin.veterinarios.index', ['usuarios' => $usuarios]);
+
+        return view('admin.veterinarios.index', ['usuarios' => $usuarios, 'veterinarias' => $veterinarias]);
     }
     /**
      * Show the form for creating a new resource.
@@ -106,6 +109,28 @@ class UsuarioAdminController extends Controller
         return redirect()->route('admin.usuarios.index')
             ->with('success', 'Rol de ' . $usuario->name . ' actualizado a "' . $data['role'] . '".');
     }
+
+    public function asignarVeterinaria(Request $request, $id)
+    {
+        $data = $request->validate([
+            'veterinaria_id' => 'nullable|string',
+        ]);
+                $usuario = User::findOrFail($id);
+        if ($usuario->role !== 'vet') {
+            return redirect()->route('admin.veterinarios.index')
+                ->with('error', 'Solo se puede asignar una veterinaria a un usuario con rol "vet".');
+        }
+        $usuario->veterinaria_id = $data['veterinaria_id'] ?: null;
+        $usuario->save();
+
+        $db = Firebase::database();
+        $db->getReference('usuarios/' . $usuario->id)->update([
+            'veterinaria_id' => $usuario->veterinaria_id,
+        ]); 
+
+        return redirect()->route('admin.veterinarios.index')
+            ->with('success', 'Veterinaria asignada a ' . $usuario->name . '.');
+    }   
 
 
     /**

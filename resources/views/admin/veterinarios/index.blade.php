@@ -33,6 +33,19 @@
                         <td>{{ $usuario->email }}</td>
                         <td>{{ $usuario->created_at->format('d/m/Y') }}</td>
                         <td class="text-end">
+                            <form action="{{ route('admin.veterinarios.veterinaria', $usuario->id) }}" method="POST" class="d-inline"
+                                  onsubmit="return confirm('¿Asignar la veterinaria a {{ $usuario->name }}?');">
+                                @csrf
+                                @method('PUT')
+                                <select name="veterinaria_id" class="form-select form-select-sm d-inline w-auto">
+                                    <option value="">Sin asignar</option>
+                                    @foreach ($veterinarias as $vetId => $vet)
+                                        <option value="{{ $vetId }}" {{ $usuario->veterinaria_id == $vetId ? 'selected' : '' }}>
+                                            {{ $vet['nombre'] }} — {{ $vet['direccion'] }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                <button type="submit" class="btn btn-sm btn-petcare">Asignar</button>
                             <form action="{{ route('admin.usuarios.rol', $usuario->id) }}" method="POST" class="d-inline"
                                   onsubmit="return confirm('¿Quitar el rol de veterinario a {{ $usuario->name }}? Pasará a ser usuario común.');">
                                 @csrf
@@ -40,7 +53,7 @@
                                 <input type="hidden" name="role" value="user">
                                 <button type="submit" class="btn btn-sm btn-outline-secondary">Quitar rol vet</button>
                             </form>
-                        </td>
+                            
                     </tr>
                 @endforeach
             </tbody>

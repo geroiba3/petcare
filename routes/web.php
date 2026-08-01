@@ -72,11 +72,13 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::put('usuarios/{id}/rol', [UsuarioAdminController::class, 'cambiarRol'])->name('usuarios.rol');
     Route::put('usuarios/{id}/activo', [UsuarioAdminController::class, 'toggleActivo'])->name('usuarios.activo');
     Route::get('veterinarios', [UsuarioAdminController::class, 'veterinarios'])->name('veterinarios.index');
+    Route::put('veterinarios/{id}/veterinaria', [UsuarioAdminController::class, 'asignarVeterinaria'])->name('veterinarios.veterinaria');
     Route::get('mascotas', [MascotaAdminController::class, 'index'])->name('mascotas.index');
     Route::get('mascotas/{userId}/{mascotaId}/editar', [MascotaAdminController::class, 'edit'])->name('mascotas.edit');
     Route::put('mascotas/{userId}/{mascotaId}', [MascotaAdminController::class, 'update'])->name('mascotas.update');
     Route::put('mascotas/{userId}/{mascotaId}/activo', [MascotaAdminController::class, 'toggleActivo'])->name('mascotas.activo');
 });
+Route::put('/perfil/horario', [UsuarioController::class, 'guardarHorario'])->name('perfil.horario');
 });
 
 Route::get('/auth/google', [GoogleController::class, 'redirect'])->name('google.redirect');

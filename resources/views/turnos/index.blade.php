@@ -31,7 +31,7 @@
                         </div>
                         <p class="text-muted mb-1">📅 {{ $turno['fecha'] }} - 🕐 {{ $turno['hora'] }}</p>
                         <p class="text-muted mb-3">{{ $turno['motivo'] }}</p>
-
+                        <p class="text-muted mb-1">🏥 {{ $turno['veterinaria_nombre'] ?? 'Sin especificar' }}</p>
                         <form method="POST" action="/turnos/{{ $id }}">
                             @csrf
                             @method('DELETE')
