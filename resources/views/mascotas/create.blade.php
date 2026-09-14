@@ -43,7 +43,14 @@
                             <option value="otro">Otro</option>
                         </select>
                     </div>
-
+                    <div class="mb-3">
+                        <label class="form-label fw-medium">Sexo</label>
+                        <select name="sexo" class="form-select" required>
+                            <option value="">Seleccioná una opción</option>
+                            <option value="macho"> Macho</option>
+                            <option value="hembra"> Hembra</option>
+                        </select>
+                    </div>
                     <div class="mb-3">
                         <label class="form-label fw-medium">Raza</label>
                         <input type="text" name="raza" class="form-control" placeholder="Ej: Labrador">

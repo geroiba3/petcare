@@ -50,8 +50,9 @@ class VeterinarioController extends Controller
     public function guardarConsulta(Request $request, $turnoId)
     {
         if (!auth()->user()->isVet()) {
-        return redirect('/dashboard')->with('error', 'No tenés permisos para acceder a esta sección.');
-}
+            return redirect('/dashboard')->with('error', 'No tenés permisos para acceder a esta sección.');
+        }
+
         $data = $request->validate([
             'tipo' => 'required|string',
             'diagnostico' => 'required|string|max:500',
@@ -60,10 +61,22 @@ class VeterinarioController extends Controller
 
         $db = Firebase::database();
         $turno = $db->getReference('turnos_pendientes/' . $turnoId)->getValue();
+
+        if (!$turno) {
+            return redirect('/veterinario')->with('error', 'Turno no encontrado.');
+        }
+
         $userId = $turno['usuario_id'];
         $mascotaId = $turno['mascota_id'];
 
-        // Guardar en historial de la mascota
+        // La clave en turnos/{userId} es la misma que $turnoId, por diseño
+        $turnoDueno = $db->getReference('turnos/' . $userId . '/' . $turnoId)->getValue();
+
+        if (!$turnoDueno) {
+            $db->getReference('turnos_pendientes/' . $turnoId)->remove();
+            return redirect('/veterinario')->with('error', 'Este turno fue cancelado por el dueño y ya no está disponible.');
+        }
+
         $db->getReference('historial/' . $userId . '/' . $mascotaId)->push([
             'tipo' => $data['tipo'],
             'nombre' => $turno['motivo'],
@@ -73,9 +86,8 @@ class VeterinarioController extends Controller
             'created_at' => now()->toDateTimeString(),
         ]);
 
-        // Marcar turno como completado
         $db->getReference('turnos_pendientes/' . $turnoId)->update(['estado' => 'completado']);
-        $db->getReference('turnos/' . $userId . '/' . $turno['turno_id_local'])->update(['estado' => 'completado']);
+        $db->getReference('turnos/' . $userId . '/' . $turnoId)->update(['estado' => 'completado']);
 
         return redirect('/veterinario')->with('success', 'Consulta guardada en el historial.');
     }

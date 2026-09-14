@@ -45,6 +45,9 @@
                         @if($mascota['raza'])
                             <p class="text-muted mb-1">{{ $mascota['raza'] }}</p>
                         @endif
+                         @if(!empty($mascota['sexo']))
+                        <p class="text-muted mb-1">{{ ucfirst($mascota['sexo']) }}</p>
+                        @endif
                         @if(!empty($mascota['edad']))
                             <p class="text-muted small mb-0">{{ $mascota['edad'] }}</p>
                         @endif

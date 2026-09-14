@@ -100,6 +100,7 @@ class MascotaAdminController extends Controller
         $data = $request->validate([
             'nombre' => 'required|string|max:255',
             'especie' => 'required|string',
+            'sexo' => 'nullable|string',
             'raza' => 'nullable|string',
             'fecha_nacimiento' => 'nullable|date|before_or_equal:today',
         ]);
@@ -108,6 +109,7 @@ class MascotaAdminController extends Controller
         $db->getReference('mascotas/' . $userId . '/' . $mascotaId)->update([
             'nombre' => $data['nombre'],
             'especie' => $data['especie'],
+            'sexo' => $data['sexo'] ?? '',
             'raza' => $data['raza'] ?? '',
             'fecha_nacimiento' => $data['fecha_nacimiento'] ?? '',
         ]);

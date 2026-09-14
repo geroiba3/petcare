@@ -10,7 +10,7 @@ class HistorialController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index($mascotaId)
+    public function index(Request $request, $mascotaId)
     {
         $db = Firebase::database();
         $userId = auth()->id();
@@ -21,59 +21,61 @@ class HistorialController extends Controller
         if ($historial) {
             uasort($historial, fn($a, $b) => strcmp($b['fecha'], $a['fecha']));
         }
+        $tipo = $request->query('tipo','todos');
 
+        if ($tipo !== 'todos') {
+            $historial = array_filter($historial, fn($c) => ($c['tipo'] ?? '') === $tipo);
+        }
         return view('historial.index', [
             'mascota' => $mascota,
             'mascotaId' => $mascotaId,
             'historial' => $historial,
+            'tipo' => $tipo
         ]);
     }
+ public function create($mascotaId){
+    $db = Firebase::database();
+     $userId = auth()->id();
+        $mascota = $db->getReference('mascotas/' . $userId . '/' . $mascotaId)->getValue();
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
+        if (!$mascota) {
+            return redirect('/mascotas')->with('error', 'Mascota no encontrada.');
+        }
+
+        return view('historial.create', ['mascota' => $mascota, 'mascotaId' => $mascotaId]);
     }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+  public function store(Request $request, $mascotaId)
     {
-        //
-    }
+        $data = $request->validate([
+            'tipo' => 'required|in:vacuna,enfermedad,tratamiento,desparasitacion,consulta',
+            'nombre' => 'required|string|max:255',
+            'fecha' => 'required|date|before_or_equal:today',
+            'proximo_vencimiento' => 'nullable|date',
+            'descripcion' => 'nullable|string|max:500',
+            'archivo' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:5120',
+        ]);
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
+        $db = Firebase::database();
+        $userId = auth()->id();
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
+        $registro = [
+            'tipo' => $data['tipo'],
+            'nombre' => $data['nombre'],
+            'fecha' => $data['fecha'],
+            'proximo_vencimiento' => $data['proximo_vencimiento'] ?? null,
+            'descripcion' => $data['descripcion'] ?? '',
+            'creado_por' => 'dueno',
+            'created_at' => now()->toDateTimeString(),
+        ];
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
+        if ($request->hasFile('archivo')) {
+            $archivo = $request->file('archivo');
+            $registro['archivo'] = 'data:' . $archivo->getMimeType() . ';base64,' . base64_encode(file_get_contents($archivo->getRealPath()));
+            $registro['archivo_nombre'] = $archivo->getClientOriginalName();
+        }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        $db->getReference('historial/' . $userId . '/' . $mascotaId)->push($registro);
+
+        return redirect()->route('historial.index', $mascotaId)->with('success', '¡Registro agregado!');
     }
 }

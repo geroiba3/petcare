@@ -139,20 +139,16 @@ class TurnoController extends Controller
 }
     public function destroy($id)
     {
-         $db = Firebase::database();
+        $db = Firebase::database();
         $userId = auth()->id();
         $turno = $db->getReference('turnos/' . $userId . '/' . $id)->getValue();
 
-        if ($turno) {
-            // Liberamos el horario en la agenda del vet
-            if (!empty($turno['vet_id'])) {
+        if ($turno && !empty($turno['vet_id'])) {
             $db->getReference('agenda/' . $turno['vet_id'] . '/' . $turno['fecha'] . '/' . $this->horaKey($turno['hora']))->remove();
-            }
-            // Sacamos también la copia del panel del vet
-            if (!empty($turno['turno_id_local'])) {
-                $db->getReference('turnos_pendientes/' . $turno['turno_id_local'])->remove();
-            }
         }
+
+        // La clave en turnos_pendientes es SIEMPRE la misma que acá, por diseño (mismo $turnoId del push original)
+        $db->getReference('turnos_pendientes/' . $id)->remove();
 
         $db->getReference('turnos/' . $userId . '/' . $id)->remove();
 

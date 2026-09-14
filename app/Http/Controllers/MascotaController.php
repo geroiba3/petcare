@@ -73,6 +73,7 @@ class MascotaController extends Controller
         $db->getReference('mascotas/' . $userId)->push([
             'nombre' => $data['nombre'],
             'especie' => $data['especie'],
+            'sexo' => $data['sexo'],
             'raza' => $data['raza'] ?? '',
             'fecha_nacimiento' => $data['fecha_nacimiento'] ?? '',
             'foto' => $fotoBase64,
@@ -98,6 +99,7 @@ class MascotaController extends Controller
         $data = $request->validate([
             'nombre' => 'required|string|max:255',
             'especie' => 'required|string',
+            'sexo' => 'required|string',
             'raza' => 'nullable|string',
             'fecha_nacimiento' => 'nullable|date|before_or_equal:today',
             'foto' => 'nullable|image|max:2048',
@@ -110,6 +112,7 @@ class MascotaController extends Controller
         $actualizacion = [
             'nombre' => $data['nombre'],
             'especie' => $data['especie'],
+            'sexo' => $data['sexo'],
             'raza' => $data['raza'] ?? '',
             'fecha_nacimiento' => $data['fecha_nacimiento'] ?? '',
         ];

@@ -54,6 +54,8 @@ Route::post('/turnos', [TurnoController::class, 'store'])->name('turnos.store');
 Route::delete('/turnos/{id}', [TurnoController::class, 'destroy'])->name('turnos.destroy');
 
 Route::get('/mascotas/{mascotaId}/historial', [HistorialController::class, 'index'])->name('historial.index');
+Route::get('/historial/{mascotaId}/crear', [HistorialController::class, 'create'])->name('historial.create');
+Route::post('/historial/{mascotaId}', [HistorialController::class, 'store'])->name('historial.store');
 
 Route::get('/veterinario', [VeterinarioController::class, 'index'])->name('veterinario.index');
 Route::get('/veterinario/turnos/{turnoId}/completar', [VeterinarioController::class, 'completar'])->name('veterinario.completar');
