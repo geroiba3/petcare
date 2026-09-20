@@ -4,21 +4,21 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\User;
 use Kreait\Laravel\Firebase\Facades\Firebase;
 
 class MascotaAdminController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index(Request $request)
     {
-       $db = Firebase::database();
+        $db = Firebase::database();
         $todas = $db->getReference('mascotas')->getValue() ?? [];
 
-        // Traemos los nombres de los dueños desde SQLite en una sola consulta
-        $duenios = User::whereIn('id', array_keys($todas))->pluck('name', 'id');
+        // Antes: User::whereIn('id', array_keys($todas))->pluck('name', 'id')
+        $todosUsuarios = $db->getReference('usuarios')->getValue() ?? [];
+        $duenios = [];
+        foreach (array_keys($todas) as $userId) {
+            $duenios[$userId] = $todosUsuarios[$userId]['name'] ?? 'Usuario eliminado';
+        }
 
         $filtro = $request->query('estado', 'todas'); // todas | activas | inactivas
 
@@ -47,33 +47,21 @@ class MascotaAdminController extends Controller
         ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
         //
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         //
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show($userId, $mascotaId)
     {
         //
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit($userId, $mascotaId)
     {
         $db = Firebase::database();
@@ -82,7 +70,7 @@ class MascotaAdminController extends Controller
         if (!$mascota) {
             return redirect()->route('admin.mascotas.index')
                 ->with('error', 'Mascota no encontrada.');
-    }
+        }
 
         return view('admin.mascotas.edit', [
             'mascota' => $mascota,
@@ -91,12 +79,8 @@ class MascotaAdminController extends Controller
         ]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, $userId, $mascotaId)
     {
-       
         $data = $request->validate([
             'nombre' => 'required|string|max:255',
             'especie' => 'required|string',
@@ -118,9 +102,6 @@ class MascotaAdminController extends Controller
             ->with('success', 'Mascota "' . $data['nombre'] . '" actualizada.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function toggleActivo($userId, $mascotaId)
     {
         $db = Firebase::database();
@@ -132,7 +113,6 @@ class MascotaAdminController extends Controller
                 ->with('error', 'Mascota no encontrada.');
         }
 
-        // Si nunca tuvo el campo, la tratamos como activa y la pasamos a inactiva
         $nuevoEstado = !($mascota['activo'] ?? true);
         $ref->update(['activo' => $nuevoEstado]);
 

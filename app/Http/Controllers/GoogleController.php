@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
+use App\Models\FirebaseUser;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -11,45 +11,52 @@ use Laravel\Socialite\Facades\Socialite;
 
 class GoogleController extends Controller
 {
-    // Redirige al usuario a Google
     public function redirect()
     {
         return Socialite::driver('google')->redirect();
     }
 
-    // Google devuelve al usuario acá
     public function callback()
     {
         $googleUser = Socialite::driver('google')->stateless()->user();
+        $db = Firebase::database();
 
         // Buscar si ya existe un usuario con ese email
-        $user = User::where('email', $googleUser->getEmail())->first();
+                // Buscar si ya existe un usuario con ese email
+        \Log::info('Buscando usuario con email: ' . $googleUser->getEmail());
 
-        if (!$user) {
-            // Crear usuario nuevo
-            $user = User::create([
+        $resultados = $db->getReference('usuarios')
+            ->orderByChild('email')
+            ->equalTo($googleUser->getEmail())
+            ->getValue();
+
+        \Log::info('Resultado de la búsqueda: ' . json_encode($resultados));
+
+        if ($resultados) {
+            $id = array_key_first($resultados);
+            $user = new FirebaseUser($id, $resultados[$id]);
+        } else {
+            // Crear usuario nuevo con un ID incremental simple (siguiendo el patrón de IDs cortos ya usado)
+            $ref = $db->getReference('usuarios')->push([
                 'name' => $googleUser->getName(),
                 'email' => $googleUser->getEmail(),
                 'password' => Hash::make(Str::random(24)),
                 'role' => 'user',
-            ]);
-
-            // Guardar en Firebase
-            $db = Firebase::database();
-            $db->getReference('usuarios/' . $user->id)->set([
-                'id' => $user->id,
-                'name' => $user->name,
-                'email' => $user->email,
-                'role' => 'user',
+                'activo' => true,
                 'created_at' => now()->toDateTimeString(),
             ]);
-            
+            $id = $ref->getKey();
+            $user = new FirebaseUser($id, $db->getReference('usuarios/' . $id)->getValue());
         }
-            if (!$user->activo) {
+
+        if (!$user->activo) {
             return redirect('/login')->with('error', 'Tu cuenta está desactivada. Contactá al administrador.');
-            }
-  
+        }
+      \Log::info('Google login - user id: ' . $user->getAuthIdentifier() . ' email: ' . $user->email . ' activo: ' . var_export($user->activo, true));
+
         Auth::login($user);
+
+        \Log::info('Después de Auth::login - check: ' . var_export(Auth::check(), true) . ' id: ' . var_export(Auth::id(), true));
 
         return redirect('/dashboard');
     }

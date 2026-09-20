@@ -9,12 +9,18 @@
 </head>
 <body class="bg-light">
 
-    <!-- Navbar -->
+       <!-- Navbar -->
     <nav class="navbar navbar-expand-lg bg-white shadow-sm px-4">
         <a class="navbar-brand fw-bold text-warning" href="/dashboard">🐾 PetCare</a>
         <div class="ms-auto d-flex align-items-center gap-3">
             @auth
-             <a href="/perfil" class="text-muted text-decoration-none">Hola, {{ auth()->user()->name }}</a>
+                @if (auth()->user()->isAdmin())
+                    <a href="{{ route('admin.dashboard') }}" class="btn btn-outline-warning btn-sm">Panel Admin</a>
+                @endif
+                @if (auth()->user()->isVet())
+                    <a href="{{ route('veterinario.index') }}" class="btn btn-outline-warning btn-sm">Panel Veterinario</a>
+                @endif
+                <a href="/perfil" class="text-muted text-decoration-none">Hola, {{ auth()->user()->name }}</a>
                 <form method="POST" action="/logout">
                     @csrf
                     <button type="submit" class="btn btn-warning text-white">Cerrar sesión</button>
