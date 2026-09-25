@@ -8,10 +8,12 @@ use App\Http\Controllers\HistorialController;
 use App\Http\Controllers\VeterinarioController;
 use App\Http\Controllers\UsuarioController;
 use App\Http\Controllers\GoogleController;
+use App\Http\Controllers\ForoController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\VeterinariaController;
 use App\Http\Controllers\Admin\UsuarioAdminController;
 use App\Http\Controllers\Admin\MascotaAdminController;
+
 
 Route::get('/', function () {
     return view('index');
@@ -63,6 +65,15 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 Route::resource('veterinarias', VeterinariaController::class)->except(['show']);
 });
+
+Route::get('/foro', [ForoController::class, 'index'])->name('foro.index');
+Route::get('/foro/nuevo', [ForoController::class, 'create'])->name('foro.create');
+Route::post('/foro', [ForoController::class, 'store'])->name('foro.store');
+Route::get('/foro/{categoria}/{postId}', [ForoController::class, 'show'])->name('foro.show');
+Route::post('/foro/{categoria}/{postId}/responder', [ForoController::class, 'responder'])->name('foro.responder');
+Route::delete('/foro/{categoria}/{postId}', [ForoController::class, 'destroyPost'])->name('foro.destroy');
+Route::delete('/foro/{categoria}/{postId}/respuesta/{respuestaId}', [ForoController::class, 'destroyRespuesta'])->name('foro.respuesta.destroy');
+
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
     Route::resource('veterinarias', VeterinariaController::class)->except(['show']);
