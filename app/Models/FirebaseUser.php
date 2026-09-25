@@ -15,6 +15,7 @@ class FirebaseUser implements Authenticatable
     public ?string $veterinaria_id;
     public ?array $horario;
     public ?string $created_at;
+    public ?string $foto = null;
     public ?string $remember_token = null;
 
     public function __construct(string $id, array $data)
@@ -28,6 +29,7 @@ class FirebaseUser implements Authenticatable
         $this->veterinaria_id = $data['veterinaria_id'] ?? null;
         $this->horario = $data['horario'] ?? null;
         $this->created_at = $data['created_at'] ?? null;
+        $this->foto = $data['foto'] ?? null;
         $this->remember_token = $data['remember_token'] ?? null;
     }
 
@@ -95,6 +97,7 @@ class FirebaseUser implements Authenticatable
             'veterinaria_id' => $this->veterinaria_id,
             'horario' => $this->horario,
             'created_at' => $this->created_at,
+            'foto' => $this->foto,
             'remember_token' => $this->remember_token,
         ];
     }

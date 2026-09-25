@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Models\User;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Kreait\Laravel\Firebase\Facades\Firebase;
 
 class DashboardController extends Controller
 {
@@ -13,8 +13,22 @@ class DashboardController extends Controller
      */
     public function index()
     {
-        $totalUsuarios = User::where('role', 'user')->count();
-        $totalVeterinarios = User::where('role', 'vet')->count();
+        $db = Firebase::database();
+        $todos = $db->getReference('usuarios')->getValue() ?? [];
+
+        $totalUsuarios = 0;
+        $totalVeterinarios = 0;
+
+        foreach ($todos as $usuario) {
+            if (!is_array($usuario)) {
+                continue;
+            }
+            if (($usuario['role'] ?? null) === 'user') {
+                $totalUsuarios++;
+            } elseif (($usuario['role'] ?? null) === 'vet') {
+                $totalVeterinarios++;
+            }
+        }
 
         return view('admin.dashboard', compact('totalUsuarios', 'totalVeterinarios'));
     }

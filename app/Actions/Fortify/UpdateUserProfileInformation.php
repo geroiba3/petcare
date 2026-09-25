@@ -2,11 +2,10 @@
 
 namespace App\Actions\Fortify;
 
-use App\Models\User;
-use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
+use Kreait\Laravel\Firebase\Facades\Firebase;
 use Laravel\Fortify\Contracts\UpdatesUserProfileInformation;
 
 class UpdateUserProfileInformation implements UpdatesUserProfileInformation
@@ -18,44 +17,29 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
      *
      * @throws ValidationException
      */
-    public function update(User $user, array $input): void
+    public function update(Authenticatable $user, array $input): void
     {
         Validator::make($input, [
             'name' => ['required', 'string', 'max:255'],
-
-            'email' => [
-                'required',
-                'string',
-                'email',
-                'max:255',
-                Rule::unique('users')->ignore($user->id),
-            ],
+            'email' => ['required', 'string', 'email', 'max:255'],
         ])->validateWithBag('updateProfileInformation');
 
-        if ($input['email'] !== $user->email &&
-            $user instanceof MustVerifyEmail) {
-            $this->updateVerifiedUser($user, $input);
-        } else {
-            $user->forceFill([
-                'name' => $input['name'],
-                'email' => $input['email'],
-            ])->save();
-        }
-    }
+        $db = Firebase::database();
+        $id = $user->getAuthIdentifier();
 
-    /**
-     * Update the given verified user's profile information.
-     *
-     * @param  array<string, string>  $input
-     */
-    protected function updateVerifiedUser(User $user, array $input): void
-    {
-        $user->forceFill([
+        // Chequeo manual de email duplicado (antes lo hacía Rule::unique('users')->ignore($user->id))
+        $todos = $db->getReference('usuarios')->getValue() ?? [];
+        foreach ($todos as $otroId => $otroUsuario) {
+            if ((string) $otroId !== (string) $id && is_array($otroUsuario) && ($otroUsuario['email'] ?? null) === $input['email']) {
+                throw ValidationException::withMessages([
+                    'email' => ['Ese email ya está en uso.'],
+                ])->errorBag('updateProfileInformation');
+            }
+        }
+
+        $db->getReference('usuarios/' . $id)->update([
             'name' => $input['name'],
             'email' => $input['email'],
-            'email_verified_at' => null,
-        ])->save();
-
-        $user->sendEmailVerificationNotification();
+        ]);
     }
 }
