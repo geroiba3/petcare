@@ -2,7 +2,8 @@
 
 namespace App\Actions\Fortify;
 
-use App\Models\User;
+use Illuminate\Contracts\Auth\Authenticatable;
+use Kreait\Laravel\Firebase\Facades\Firebase;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
@@ -19,14 +20,15 @@ class ResetUserPassword implements ResetsUserPasswords
      *
      * @throws ValidationException
      */
-    public function reset(User $user, array $input): void
+    public function reset(Authenticatable $user, array $input): void
     {
         Validator::make($input, [
             'password' => $this->passwordRules(),
         ])->validate();
 
-        $user->forceFill([
+        $db = Firebase::database();
+        $db->getReference('usuarios/' . $user->getAuthIdentifier())->update([
             'password' => Hash::make($input['password']),
-        ])->save();
+        ]);
     }
 }

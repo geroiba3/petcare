@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -9,60 +10,45 @@ use Kreait\Laravel\Firebase\Facades\Firebase;
 
 class UsuarioController extends Controller
 {
-    private function authenticatedUser(): \Illuminate\Foundation\Auth\User
+    private function authenticatedUser(): Authenticatable
     {
         $user = Auth::user();
 
-        if (!$user instanceof \Illuminate\Foundation\Auth\User) {
+        if (!$user) {
             abort(401);
         }
 
         return $user;
     }
 
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
         $user = $this->authenticatedUser();
         return view('usuario.index', ['user' => $user]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
         //
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         //
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(string $id)
     {
         //
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-     public function edit()
+    public function edit()
     {
         $user = $this->authenticatedUser();
         $horario = null;
         if ($user->role === 'vet') {
             $db = Firebase::database();
-            $horario =  $db->getReference('usuarios/' . $user->id . '/horario')->getValue();
+            $horario = $db->getReference('usuarios/' . $user->getAuthIdentifier() . '/horario')->getValue();
         }
 
         return view('usuario.edit', ['user' => $user, 'horario' => $horario]);
@@ -71,20 +57,23 @@ class UsuarioController extends Controller
     public function update(Request $request)
     {
         $user = $this->authenticatedUser();
+        $db = Firebase::database();
+        $id = $user->getAuthIdentifier();
 
         $data = $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email,' . $user->id,
+            'email' => 'required|email|max:255',
             'foto' => 'nullable|image|max:2048',
         ]);
 
-        // Actualizar en SQLite
-        $user->name = $data['name'];
-        $user->email = $data['email'];
-        $user->save();
+        // Chequeo manual de email duplicado (antes: unique:users,email,...)
+        $todos = $db->getReference('usuarios')->getValue() ?? [];
+        foreach ($todos as $otroId => $otroUsuario) {
+            if ((string) $otroId !== (string) $id && is_array($otroUsuario) && ($otroUsuario['email'] ?? null) === $data['email']) {
+                return back()->withErrors(['email' => 'Ese email ya está en uso.']);
+            }
+        }
 
-        // Actualizar en Firebase
-        $db = Firebase::database();
         $actualizacion = [
             'name' => $data['name'],
             'email' => $data['email'],
@@ -96,7 +85,7 @@ class UsuarioController extends Controller
             $actualizacion['foto'] = $fotoBase64;
         }
 
-        $db->getReference('usuarios/' . $user->id)->update($actualizacion);
+        $db->getReference('usuarios/' . $id)->update($actualizacion);
 
         return redirect('/perfil')->with('success', '¡Perfil actualizado!');
     }
@@ -110,12 +99,14 @@ class UsuarioController extends Controller
 
         $user = $this->authenticatedUser();
 
-        if (!Hash::check($request->password_actual, $user->password)) {
+        if (!Hash::check($request->password_actual, $user->getAuthPassword())) {
             return back()->withErrors(['password_actual' => 'La contraseña actual no es correcta.']);
         }
 
-        $user->password = Hash::make($request->password);
-        $user->save();
+        $db = Firebase::database();
+        $db->getReference('usuarios/' . $user->getAuthIdentifier())->update([
+            'password' => Hash::make($request->password),
+        ]);
 
         return redirect('/perfil')->with('success', '¡Contraseña actualizada!');
     }
@@ -124,7 +115,7 @@ class UsuarioController extends Controller
     {
         $user = $this->authenticatedUser();
 
-        if (!$user->isVet()) {
+        if (!method_exists($user, 'isVet') || !$user->isVet()) {
             abort(403);
         }
 
@@ -144,13 +135,11 @@ class UsuarioController extends Controller
         ];
 
         $db = Firebase::database();
-        $db->getReference('usuarios/' . $user->id . '/horario')->set($horario);
+        $db->getReference('usuarios/' . $user->getAuthIdentifier() . '/horario')->set($horario);
 
         return redirect('/perfil/editar')->with('success', '¡Horario actualizado!');
     }
-    /**
-     * Remove the specified resource from storage.
-     */
+
     public function destroy(string $id)
     {
         //
