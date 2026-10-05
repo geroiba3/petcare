@@ -44,7 +44,7 @@
                 <p class="text-muted">El historial médico de {{ $mascota['nombre'] }} aparecerá acá una vez que el veterinario complete un turno.</p>
             @else
                 <h4 class="fw-bold">Sin registros de este tipo</h4>
-                <p class="text-muted">No hay registros de "{{ $tipos[$tipo] }}" para {{ $mascota['nombre'] }}.</p>
+                <p class="text-muted">No hay registros de "{{ $tipos[$tipo] ?? $tipo }}" para {{ $mascota['nombre'] }}.</p>
             @endif
 
     @else
@@ -71,15 +71,20 @@
                                 <h5 class="fw-bold mb-1">{{ $consulta['nombre'] }}</h5>
                                 <p class="text-muted small mb-1"> {{ $consulta['fecha'] }}</p>
                                 @if(!empty($consulta['proximo_vencimiento']))
+                                    @php
+                                        $venc = \Carbon\Carbon::parse($consulta['proximo_vencimiento']);
+                                        $estaVencido = $venc->isPast();
+                                        $diasRestantes = abs($venc->diffInDays(now()));
+                                    @endphp
                                     <p class="small mb-1
-                                        @if(\Carbon\Carbon::parse($consulta['proximo_vencimiento'])->isPast()) text-danger fw-bold
-                                        @elseif(\Carbon\Carbon::parse($consulta['proximo_vencimiento'])->diffInDays(now()) <= 30) text-warning fw-bold
+                                        @if($estaVencido) text-danger fw-bold
+                                        @elseif($diasRestantes <= 30) text-warning fw-bold
                                         @else text-muted
                                         @endif">
                                          Próximo: {{ $consulta['proximo_vencimiento'] }}
-                                        @if(\Carbon\Carbon::parse($consulta['proximo_vencimiento'])->isPast())
+                                        @if($estaVencido)
                                             — <strong>VENCIDO</strong>
-                                        @elseif(\Carbon\Carbon::parse($consulta['proximo_vencimiento'])->diffInDays(now()) <= 30)
+                                        @elseif($diasRestantes <= 30)
                                             — Vence pronto
                                         @endif
                                     </p>

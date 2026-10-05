@@ -6,6 +6,7 @@ use App\Http\Controllers\MascotaController;
 use App\Http\Controllers\TurnoController;
 use App\Http\Controllers\HistorialController;
 use App\Http\Controllers\VeterinarioController;
+use App\Http\Controllers\VeterinariaController as VeterinariaPublicController;
 use App\Http\Controllers\UsuarioController;
 use App\Http\Controllers\GoogleController;
 use App\Http\Controllers\ForoController;
@@ -67,7 +68,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 Route::resource('veterinarias', VeterinariaController::class)->except(['show']);
 });
-
+Route::get('/veterinarias', [VeterinariaPublicController::class, 'index'])->name('veterinarias');
 Route::get('/foro', [ForoController::class, 'index'])->name('foro.index');
 Route::get('/foro/nuevo', [ForoController::class, 'create'])->name('foro.create');
 Route::post('/foro', [ForoController::class, 'store'])->name('foro.store');
