@@ -20,6 +20,7 @@
                 @if (auth()->user()->isVet())
                     <a href="{{ route('veterinario.index') }}" class="btn btn-outline-warning btn-sm">Panel Veterinario</a>
                 @endif
+                <a href="{{ route('foro.index') }}" class="text-muted text-decoration-none">💬 Foro</a>
                 <a href="/perfil" class="text-muted text-decoration-none">Hola, {{ auth()->user()->name }}</a>
                 <form method="POST" action="/logout">
                     @csrf
