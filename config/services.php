@@ -40,4 +40,7 @@ return [
     'redirect' => env('GOOGLE_REDIRECT_URI'),
 ],
 
+'disqus' => [
+    'shortname' => env('DISQUS_SHORTNAME'),
+],
 ];
