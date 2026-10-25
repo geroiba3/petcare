@@ -63,6 +63,11 @@ Route::post('/historial/{mascotaId}', [HistorialController::class, 'store'])->na
 Route::get('/veterinario', [VeterinarioController::class, 'index'])->name('veterinario.index');
 Route::get('/veterinario/turnos/{turnoId}/completar', [VeterinarioController::class, 'completar'])->name('veterinario.completar');
 Route::post('/veterinario/turnos/{turnoId}/completar', [VeterinarioController::class, 'guardarConsulta'])->name('veterinario.guardar');
+Route::get('/veterinario/buscar', [VeterinarioController::class, 'buscar'])->name('veterinario.buscar');
+Route::get('/veterinario/mascotas/{userId}/{mascotaId}/historial', [VeterinarioController::class, 'historialMascota'])->name('veterinario.historial');
+Route::get('/mascotas/{mascotaId}/historial/{registroId}', [HistorialController::class, 'show'])->name('historial.show');
+Route::get('/veterinario/mascotas/{userId}/{mascotaId}/historial/{registroId}', [VeterinarioController::class, 'detalleRegistro'])->name('veterinario.historial.detalle');
+
 
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
 Route::get('/', [DashboardController::class, 'index'])->name('dashboard');

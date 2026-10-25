@@ -78,4 +78,22 @@ class HistorialController extends Controller
 
         return redirect()->route('historial.index', $mascotaId)->with('success', '¡Registro agregado!');
     }
+        public function show($mascotaId, $registroId)
+    {
+        $db = Firebase::database();
+        $userId = auth()->id();
+
+        $mascota = $db->getReference('mascotas/' . $userId . '/' . $mascotaId)->getValue();
+        $registro = $db->getReference('historial/' . $userId . '/' . $mascotaId . '/' . $registroId)->getValue();
+
+        if (!$mascota || !$registro) {
+            return redirect()->route('historial.index', $mascotaId)->with('error', 'Registro no encontrado.');
+        }
+
+        return view('historial.show', [
+            'mascota' => $mascota,
+            'registro' => $registro,
+            'volverUrl' => route('historial.index', $mascotaId),
+        ]);
+    }
 }

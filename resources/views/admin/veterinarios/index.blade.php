@@ -40,7 +40,7 @@
                                 <select name="veterinaria_id" class="form-select form-select-sm d-inline w-auto">
                                     <option value="">Sin asignar</option>
                                     @foreach ($veterinarias as $vetId => $vet)
-                                        <option value="{{ $vetId }}" {{ $usuario->veterinaria_id == $vetId ? 'selected' : '' }}>
+                                       <option value="{{ $vetId }}" {{ ($usuario->veterinaria_id ?? null) == $vetId ? 'selected' : '' }}>
                                             {{ $vet['nombre'] }} — {{ $vet['direccion'] }}
                                         </option>
                                     @endforeach

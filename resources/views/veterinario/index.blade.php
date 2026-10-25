@@ -5,7 +5,8 @@
 <div class="d-flex justify-content-between align-items-end flex-wrap gap-3 mb-4">
     <div>
         <h2 class="fw-bold mb-1">Panel del veterinario</h2>
-        <p class="text-muted mb-0">Tu agenda de turnos pendientes.</p>
+        <p class="text-muted mb-2">Tu agenda de turnos pendientes.</p>
+        <a href="{{ route('veterinario.buscar') }}" class="btn btn-outline-secondary btn-sm">Buscar historial de una mascota</a>
     </div>
     <div class="d-flex align-items-center gap-2">
         <a href="{{ route('veterinario.index', ['semana' => $offset - 1]) }}" class="btn btn-outline-secondary btn-sm">‹</a>

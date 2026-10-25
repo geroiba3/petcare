@@ -90,7 +90,7 @@
                                     </p>
                                 @endif
                                 @if(!empty($consulta['descripcion']))
-                                    <p class="text-muted mb-0">{{ $consulta['descripcion'] }}</p>
+                                   <a href="{{ route('historial.show', ['mascotaId' => $mascotaId, 'registroId' => $id]) }}" class="btn btn-outline-secondary btn-sm mt-3">Ver detalle</a>
                                 @endif
                             </div>
                         </div>
